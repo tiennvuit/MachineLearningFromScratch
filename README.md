@@ -10,45 +10,58 @@ Implementation and explain details about particular algorithms, models, concepts
             
             - Source code:
             
-            - Demo
+            - Demo:
+
+            - Notebook:
             
             - Explain:
 
+            - Resources:
 
         1.1.2 Polynomial Regression
 
             - Source code:
             
-            - Demo
+            - Demo:
+
+            - Notebook:
             
             - Explain:
+
+            - Resources:
+
 
     1.2. Classification
 
         1.2.1 Naive Bayes
             
-            - Source code
+            - Source code:
 
             - Demo:
 
             - Explain:
+
+            - Resources: 
 
         1.2.2 Logistic Regression
 
-            - Source code
+            - Source code:
 
             - Demo:
 
             - Explain:
 
+            - Resources:
 
         1.2.3 Support Vector Machine (SVM)
 
-            - Source code
+            - Source code:
 
             - Demo:
 
             - Explain:
+
+            - Resources:
 
 
 2. Unsupervised Learninning
