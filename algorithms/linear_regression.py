@@ -6,6 +6,7 @@ from tqdm import tqdm
 from utils.read_data import read_data
 from base_algorithm import AlgorithmML
 from utils.utils import print_info, load_config, plot_progress
+from utils.normalization import min_max_normalization
 
 
 class LinearRegression(AlgorithmML):
@@ -17,6 +18,8 @@ class LinearRegression(AlgorithmML):
         self.learning_rate = args['learning_rate']
         self.optimizer = args['optimizer']
         self.save_freq = args['save_freq']
+
+        # Call some functions
         self.build_model()
 
 
@@ -25,15 +28,16 @@ class LinearRegression(AlgorithmML):
 
 
     def build_model(self):
-        # Build the function h(x) = W*x + b
-        self.parameters['W'] = np.random.rand(8)
-        self.parameters['b'] = np.random.rand(1)
+        # Build the function h(x) = W*x, W = [w_{n}, w_{n-1}, w_{n-2}, ..., w_{1}, w_{0}]
+        np.random.seed(seed=18521489)
+        self.parameters['W'] = np.random.rand(9)
+        # self.parameters['b'] = np.random.rand(1)
 
 
     def learn(self, X:np.array, y:np.array, output_log='logs/linear_regression.csv'):
         
         # Define number of interation for each epoch
-        self.iters = len(y) // self.epochs
+        self.iters = len(y) // self.batch_size
 
         # Performce learning progress
         for epoch in range(self.epochs):
@@ -42,27 +46,23 @@ class LinearRegression(AlgorithmML):
             # Loop through each iterations
             for iter in tqdm(range(self.iters)):
                 
-                # Get the random index
+                # Get the random indices
                 idx_current_batch = np.random.choice(range(len(y)), self.batch_size)
+                mini_batch = np.hstack((X[idx_current_batch],np.zeros((X[idx_current_batch].shape[0],1))))
                 y_true = y[idx_current_batch]
     
                 # Feed fowarding
-                y_pred = np.sum(self.parameters['W'] * X[idx_current_batch], axis=1) + self.parameters['b']
+                y_pred = np.sum(self.parameters['W']*mini_batch, axis=1)
 
-                # Compute cost
-                cost = np.sum((y_true-y_pred)**2)/2/len(idx_current_batch)
-            
                 # Computer gradient
-                gradient_W = cost*X[idx_current_batch]
-                gradient_b = cost
-
+                gradient = np.sum(np.expand_dims((y_pred-y_true),1)*mini_batch, axis=0)/len(idx_current_batch)
+                
                 # Update paramters
-                self.parameters['W'] = self.parameters['W'] - self.learning_rate*gradient_W
-                self.parameters['b'] = self.parameters['b'] - self.learning_rate*gradient_b
-
-            if epoch % self.save_freq==0 and epoch !=0 :
+                self.parameters['W'] = self.parameters['W'] - self.learning_rate*gradient
+            
+            if epoch % self.save_freq == 0 and epoch != 0 :
                 # Save the model to disk
-                print("Epoch: {}, parameters: {}".format(epoch, self.parameters))
+                print("Epoch: {}, parameters: {}".format(epoch, self.parameters['W']))
 
 
 def main(args):
@@ -70,6 +70,9 @@ def main(args):
     # Read data from local disk
     print("[info] Reading data from disk ...")
     X, y = read_data(path=args['data_path'])
+    
+    # Normalize data
+    # X = min_max_normalization(X=X)
     
     # Build model
     print("[info] Building model ...")
